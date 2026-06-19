@@ -12560,6 +12560,11 @@ def main():
         cmd_version(args)
         return
 
+    # Wire --model-config to HERMES_MODEL_CONFIG env var for load_config()
+    _model_config_file = getattr(args, "model_config", None)
+    if _model_config_file:
+        os.environ["HERMES_MODEL_CONFIG"] = str(_model_config_file)
+
     # Discover Python plugins and register shell hooks once, before any
     # command that can fire lifecycle hooks.  Both are idempotent; gated
     # so introspection/management commands (hermes hooks list, cron

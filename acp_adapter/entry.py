@@ -27,6 +27,7 @@ except ModuleNotFoundError:
 import argparse
 import asyncio
 import logging
+import os
 import sys
 from pathlib import Path
 from hermes_constants import get_hermes_home
@@ -85,7 +86,14 @@ def _setup_logging() -> None:
     root = logging.getLogger()
     root.handlers.clear()
     root.addHandler(handler)
-    root.setLevel(logging.INFO)
+    level = os.environ.get("HERMES_ACP_LOG_LEVEL", "WARNING").upper()
+    try:
+        root.setLevel(level)
+    except ValueError:
+        root.setLevel(logging.WARNING)
+        logging.getLogger(__name__).warning(
+            "Invalid HERMES_ACP_LOG_LEVEL=%r, falling back to WARNING", level
+        )
 
     # Quiet down noisy libraries
     logging.getLogger("httpx").setLevel(logging.WARNING)
